@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "seed": 20260903,
+  "model": "DeepSeek-V4-Flash-0731",
+  "tokenizer_dir": "artifacts/model-tokenizer",
+  "deepseek_v4_encoding": "artifacts/vllm025-tokenizer/deepseek_v4_encoding.py",
+  "derived_records": {
+    "chat": 1024,
+    "agent_coding": 512,
+    "summarization": 768,
+    "mooncake": 512
+  },
+  "base_requests": {
+    "chat": 512,
+    "agent_coding": 512,
+    "summarization": 320
+  },
+  "length_limits": {
+    "chat": [64, 4096],
+    "agent_coding": [512, 12288],
+    "summarization": [2048, 16384],
+    "mooncake": [1024, 30000]
+  },
+  "max_output_tokens": 128,
+  "fixed_concurrency": {
+    "concurrency": [1, 8, 32, 64],
+    "requests_per_point": 128,
+    "repeats": 2
+  },
+  "poisson": {
+    "rates": [0.5, 1.0, 2.0, 4.0],
+    "duration_s": 60.0,
+    "max_concurrency": 256
+  },
+  "trace": {
+    "requests": 256,
+    "target_duration_s": 60.0,
+    "max_concurrency": 256
+  },
+  "profile": {
+    "requests_per_class": 4,
+    "concurrency": 1
+  },
+  "slo_ms": {
+    "ttft": 2000,
+    "tpot": 50,
+    "e2e": 30000
+  }
+}

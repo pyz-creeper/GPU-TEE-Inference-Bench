@@ -1,0 +1,9 @@
+[
+  {
+    "id": "fixture-1",
+    "conversations": [
+      {"from": "human", "value": "Give a short greeting."},
+      {"from": "gpt", "value": "Hello!"}
+    ]
+  }
+]

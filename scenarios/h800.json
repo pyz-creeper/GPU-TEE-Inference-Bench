@@ -1,0 +1,40 @@
+{
+  "seed": 20260901,
+  "scenarios": [
+    {
+      "name": "mechanism-grid",
+      "kind": "grid",
+      "input_tokens": [128, 512, 1024, 4096, 8192, 32768],
+      "output_tokens": [1, 32, 256, 2048],
+      "concurrency": [1, 8, 32, 64],
+      "requests_per_point": 64,
+      "arrival": {"type": "closed_loop"},
+      "prefix": {"ratio": 0.0}
+    },
+    {
+      "name": "serving-surface",
+      "kind": "mixture",
+      "requests": 4096,
+      "concurrency": [16, 32, 64, 128],
+      "length_buckets": [
+        {"weight": 0.45, "input": [256, 1024], "output": [64, 512], "class": "chat"},
+        {"weight": 0.25, "input": [1024, 4096], "output": [512, 2048], "class": "reasoning"},
+        {"weight": 0.20, "input": [4096, 16384], "output": [64, 512], "class": "summarization"},
+        {"weight": 0.10, "input": [16384, 32768], "output": [256, 2048], "class": "long-context"}
+      ],
+      "arrival": {"type": "gamma", "rate_rps": 2.0, "shape": 0.35},
+      "prefix": {"ratio": 0.0}
+    },
+    {
+      "name": "prefix-and-session",
+      "kind": "mixture",
+      "requests": 2048,
+      "concurrency": [32],
+      "length_buckets": [
+        {"weight": 1.0, "input": [2048, 8192], "output": [128, 512], "class": "multi-turn"}
+      ],
+      "arrival": {"type": "gamma", "rate_rps": 1.0, "shape": 0.5},
+      "prefix": {"ratio": 0.75, "tokens": [1024, 4096], "groups": 64}
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+# Python environments and build products
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+
+# Editor, local environment and credentials
+.DS_Store
+.idea/
+.vscode/
+.env
+.env.*
+!.env.example
+
+# Downloaded datasets, tokenizer/model artifacts and local caches
+/artifacts/
+/hf-cache/
+/raw/
+/.cache/
+
+# Generated workloads and benchmark outputs
+/runs/
+/results/
+workload.jsonl
+events.jsonl
+server-metrics.jsonl
+summary.json
+results.parquet
+*.parquet
+*.pt.trace.json
+*.pt.trace.json.gz
+
+# Generated campaign state; keep scenario sources and Markdown reports only
+campaigns/**/base-workloads/
+campaigns/**/derived-data/
+campaigns/**/workloads/
+campaigns/**/results/
+campaigns/**/*.log
+campaigns/**/plan.json
+campaigns/**/config.snapshot.json
+
+# Temporary profiler/server output
+profiles/
+logs/
+*.log
