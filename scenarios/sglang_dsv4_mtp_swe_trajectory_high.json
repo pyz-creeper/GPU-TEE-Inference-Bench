@@ -1,0 +1,70 @@
+{
+  "status": "local SGLang MTP replay; same frozen bundle as aliyun-high-20",
+  "source": "/data/benchmarks/coding/swe-agent-trajectories/data",
+  "dataset_revision": "68195a1450865274106246d0d0296a1d6807b88e",
+  "reference_tokenizer": "/data/model/GLM-5.3",
+  "bundle": "../runs/agentic-replay/aliyun-high-20/bundle",
+  "seed": 42,
+  "max_sessions": 20,
+  "candidate_sessions": 200,
+  "max_input_tokens": 32768,
+  "output_cap": 4096,
+  "planned_run": {
+    "models": [
+      "deepseek-v4-flash-0731"
+    ],
+    "base_url": "http://127.0.0.1:30000/v1",
+    "stream": true,
+    "enable_thinking": true,
+    "reasoning_effort": "high",
+    "session_concurrency": 1,
+    "http_concurrency": 1,
+    "repeats": 1,
+    "warmup": 0,
+    "retries": 0,
+    "cache_policy": "SGLang default radix cache; no flush and no nonce",
+    "output_cap_semantics": {
+      "deepseek-v4-flash-0731": "max_tokens bounds newly generated tokens including visible reasoning and answer"
+    },
+    "timeout_s": 300,
+    "auth": "none"
+  },
+  "results_root": "../runs/agentic-replay/sglang-dsv4-mtp-high-20/results",
+  "network": {
+    "client_location": "same benchmark host as cloud client; local loopback to 8x H20 server",
+    "api_region": "local",
+    "tier": "dedicated local SGLang",
+    "cache": "default radix cache; no flush or nonce",
+    "rate_limit": "session_concurrency=1, http_concurrency=1",
+    "other_activity": "Aliyun replay in test-run-api may overlap server startup and local replay; record actual UTC windows"
+  },
+  "target_profile": "sglang-dsv4-0731",
+  "deployment": {
+    "model_path": "/data/model/DeepSeek-V4-Flash-0731",
+    "model_file_sha256": {
+      "config.json": "6c8f3d2d3b48707541b88f32f22ef3f0f8a6b57d8523281e2b8d3cdb0ae9a023",
+      "tokenizer_config.json": "6ac8c8dc065ed118161d02dd532749ae3f52c243deac27872134fae2f50d8547",
+      "generation_config.json": "5fccff80f55a4d455bbe516bdd552edf3e9623df95e99fbf2a3c3389fdf91af0",
+      "model.safetensors.index.json": "98efab455cf08dfbbbaaba6f570e1bf10bf927d2b4c3c453a59c2f6f0e3be92b"
+    },
+    "model_revision_note": "Local checkpoint is 0731; cloud model alias deepseek-v4-flash is not proof of identical weights",
+    "environment": "/opt/miniforge3/envs/sglang-dsv4-flash",
+    "sglang_version": "0.5.18",
+    "torch_version": "2.13.0+cu130",
+    "gpu": "8x NVIDIA H20 96GB",
+    "tensor_parallel_size": 8,
+    "moe_runner_backend": "marlin",
+    "context_length": 65536,
+    "mem_fraction_static": 0.9,
+    "max_running_requests": 16,
+    "speculative_algorithm": "DSPARK",
+    "startup_script": "scripts/run_dsv4_flash_sglang_mtp_server_tmux.sh",
+    "server_warmup": "SGLang startup warmup enabled; outside benchmark window; no trajectory warmup",
+    "reasoning_mapping": "chat_template_kwargs.thinking=true and reasoning_effort=high, verified against installed serving_chat.py and DeepSeekV4Detector",
+    "parameter_reference": "https://github.com/sgl-project/sglang/blob/main/docs/cookbook/autoregressive/DeepSeek/DeepSeek-V4.mdx",
+    "speculative_dspark_block_size": 5,
+    "speculative_shape": "checkpoint default: 5 proposed draft tokens, verify window 6",
+    "initial_eagle_trial": "r1 cancelled and excluded: 0731 has a bundled DSpark head; EAGLE accepted essentially no draft tokens",
+    "readiness_probe": "Local /health may generate one internal probe token before benchmark; no trajectory warmup"
+  }
+}

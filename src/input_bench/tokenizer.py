@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import random
+from collections.abc import Mapping
 from typing import Any, Protocol
 
 
@@ -51,6 +52,16 @@ def count_input(tokenizer: Tokenizer, *, prompt: str | None,
             ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True)
         except (ValueError, TypeError, AttributeError) as exc:
             raise ValueError(f"tokenizer cannot apply its chat template: {exc}") from exc
+        # Transformers 5 can return BatchEncoding instead of a flat token list.
+        # len(BatchEncoding) counts fields, not tokens.
+        if isinstance(ids, Mapping):
+            ids = ids["input_ids"]
+        if hasattr(ids, "tolist"):
+            ids = ids.tolist()
+        if ids and isinstance(ids[0], list):
+            if len(ids) != 1:
+                raise ValueError("expected a single tokenized conversation")
+            ids = ids[0]
         return len(ids)
     assert prompt is not None
     return len(tokenizer.encode(prompt, add_special_tokens=False))

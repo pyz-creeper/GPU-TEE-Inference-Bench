@@ -1,0 +1,65 @@
+{
+  "status": "ready-for-explicit-user-start; no live replay has been executed",
+  "source": "/data/benchmarks/coding/swe-agent-trajectories/data",
+  "dataset_revision": "68195a1450865274106246d0d0296a1d6807b88e",
+  "reference_tokenizer": "/data/model/GLM-5.3",
+  "bundle": "../runs/agentic-replay/aliyun-high-20/bundle",
+  "seed": 42,
+  "max_sessions": 20,
+  "candidate_sessions": 200,
+  "max_input_tokens": 32768,
+  "output_cap": 4096,
+  "planned_run": {
+    "models": [
+      "deepseek-v4-flash",
+      "ZHIPU/GLM-5.3",
+      "ZHIPU/GLM-5.3-Flash"
+    ],
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "api_key_env": "DASHSCOPE_API_KEY",
+    "stream": true,
+    "enable_thinking": true,
+    "reasoning_effort": "high",
+    "session_concurrency": 1,
+    "http_concurrency": 1,
+    "repeats": 1,
+    "warmup": 0,
+    "retries": 0,
+    "cache_policy": "provider-default; no flush and no nonce",
+    "output_cap_semantics": {
+      "deepseek-v4-flash": "max_tokens includes reasoning and answer per Alibaba Chat API documentation",
+      "ZHIPU/GLM-5.3": "max_tokens=4096 requested; inclusion of thinking is not verified for Alibaba third-party direct endpoint",
+      "ZHIPU/GLM-5.3-Flash": "max_tokens=4096 requested; inclusion of thinking is not verified for Alibaba third-party direct endpoint"
+    },
+    "timeout_s": 300
+  },
+  "pricing": {
+    "currency": "CNY",
+    "unit": "per million tokens",
+    "checked_date": "2026-09-07",
+    "source": "https://help.aliyun.com/zh/model-studio/model-pricing",
+    "models": {
+      "deepseek-v4-flash": {
+        "input": 1.0,
+        "output": 2.0
+      },
+      "ZHIPU/GLM-5.3": {
+        "input": 8.0,
+        "output": 28.0
+      },
+      "ZHIPU/GLM-5.3-Flash": {
+        "input": 0.8,
+        "output": 2.8
+      }
+    },
+    "notes": "Uses GLM Flash list price, excludes temporary 50% promotion, free quotas and cache discounts. Estimates use reference input counts; final billing uses server usage. Output examples are scenarios, not hard cost bounds."
+  },
+  "results_root": "../runs/agentic-replay/aliyun-high-20/results",
+  "network": {
+    "client_location": "current benchmark host; same host for all three API models",
+    "api_region": "cn-beijing",
+    "tier": "pay-as-you-go; record account-specific tier if applicable",
+    "cache": "provider default, no flush or nonce",
+    "rate_limit": "record observed 429; no assumed fixed RPS"
+  }
+}

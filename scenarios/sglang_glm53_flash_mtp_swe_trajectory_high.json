@@ -1,0 +1,109 @@
+{
+  "status": "GLM-5.3-Flash on 192.168.0.65 with EAGLE MTP; same frozen SWE trajectory bundle",
+  "source": "/data/benchmarks/coding/swe-agent-trajectories/data",
+  "dataset_revision": "68195a1450865274106246d0d0296a1d6807b88e",
+  "reference_tokenizer": "/data/model/GLM-5.3",
+  "bundle": "../runs/agentic-replay/aliyun-high-20/bundle",
+  "seed": 42,
+  "max_sessions": 20,
+  "candidate_sessions": 200,
+  "max_input_tokens": 32768,
+  "output_cap": 4096,
+  "planned_run": {
+    "models": [
+      "GLM-5.3-Flash"
+    ],
+    "base_url": "http://127.0.0.1:30001/v1",
+    "stream": true,
+    "enable_thinking": true,
+    "reasoning_effort": "high",
+    "session_concurrency": 1,
+    "http_concurrency": 1,
+    "repeats": 1,
+    "warmup": 0,
+    "retries": 0,
+    "cache_policy": "SGLang provider-default prefix cache; no flush and no nonce",
+    "output_cap_semantics": {
+      "GLM-5.3-Flash": "max_tokens bounds generated thinking and answer tokens; preserve server usage"
+    },
+    "timeout_s": 300,
+    "auth": "none"
+  },
+  "results_root": "../runs/agentic-replay/sglang-glm53-flash-mtp-high-20/results",
+  "network": {
+    "client_location": "192.168.0.63, same client as Aliyun and prior local DeepSeek replay",
+    "server_location": "192.168.0.65, 8x H20",
+    "transport": "SSH local forwarding 127.0.0.1:30001 -> 192.168.0.65:127.0.0.1:30000; includes SSH encryption and LAN latency",
+    "api_region": "local private network",
+    "tier": "dedicated SGLang",
+    "cache": "default prefix cache; pre-existing server restarted for 64K; no explicit flush",
+    "rate_limit": "session=1, HTTP=1; no other benchmark requests scheduled"
+  },
+  "target_profile": "sglang-glm53-flash",
+  "deployment": {
+    "host": "192.168.0.65",
+    "model_path": "/data/model/GLM-5.3-Flash",
+    "model_metadata": {
+      "config": {
+        "architectures": [
+          "Glm5NextForConditionalGeneration"
+        ],
+        "model_type": "glm5_next",
+        "hidden_size": null,
+        "num_hidden_layers": null,
+        "num_attention_heads": null,
+        "num_nextn_predict_layers": null,
+        "n_routed_experts": null,
+        "num_experts_per_tok": null,
+        "dtype": null
+      },
+      "quantization": {
+        "quant_method": "fp8",
+        "fmt": "e4m3",
+        "weight_block_size": [
+          128,
+          128
+        ]
+      },
+      "shard_count": 62,
+      "expected_shards": 62,
+      "missing_shards": [],
+      "shard_bytes": 328337455672,
+      "metadata_sha256": {
+        "config.json": "bb8f01c42cb92a52ca72e65afb4d5bd8d11aef083cd210e8de25dfb904f23e9f",
+        "tokenizer_config.json": "98b1271574f41abf89427ae2dda030d94dc9478f0edc5a8bd240db213c6fd5fc",
+        "chat_template.jinja": "34d5ee66b12fa6446cdae131c352b8f68cd85369e0e6fda115583805fada3891",
+        "generation_config.json": "230c30609ecbbb9e6583bedde8e7bdda0c6eb8fe5fad0eaeb3d1b293d751cb4f",
+        "model.safetensors.index.json": "3c3f40366a53c3fd7974b4eab7881a365a98c2a4329150befebab99fe7c18b05"
+      }
+    },
+    "environment": "/opt/miniforge3/envs/glm53-sglang",
+    "sglang_version": "0.0.0.dev1+gc767511ea",
+    "sglang_commit": "c767511ea832829129ba5255ced67b9ce1a9bc2b",
+    "sglang_existing_dirty_file": "python/sglang/srt/model_executor/model_runner_components/load_model_utils.py; preserved",
+    "gpu": "8x NVIDIA H20 96GB",
+    "tensor_parallel_size": 8,
+    "expert_parallel_size": 8,
+    "quantization": "fp8",
+    "kv_cache_dtype": "bfloat16",
+    "attention_backend": "dsa",
+    "dsa_prefill_backend": "tilelang",
+    "dsa_decode_backend": "tilelang",
+    "linear_attn_backend": "triton",
+    "moe_runner_backend": "deep_gemm",
+    "context_length": 65536,
+    "mem_fraction_static": 0.7,
+    "speculative_algorithm": "EAGLE",
+    "speculative_num_steps": 5,
+    "speculative_eagle_topk": 1,
+    "speculative_num_draft_tokens": 6,
+    "speculative_adaptive": true,
+    "startup_script": "scripts/run_glm53_flash_mtp_server_remote.sh wrapping /root/glm53-flash/scripts/start_sglang.sh",
+    "reasoning_mapping": "checkpoint chat_template always opens <think>; reasoning_effort=high reaches template via serving_chat.py; no enable_thinking toggle in checkpoint",
+    "sampling_defaults": {
+      "temperature": 1.0,
+      "top_p": 0.95
+    },
+    "readiness_probe": "/server_info read only; SGLang internal startup warmup outside benchmark; trajectory warmup=0"
+  }
+}

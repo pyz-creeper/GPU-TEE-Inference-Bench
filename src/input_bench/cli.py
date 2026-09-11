@@ -64,6 +64,8 @@ def build_parser() -> argparse.ArgumentParser:
     compile_p.add_argument("--max-samples", type=int); compile_p.add_argument("--min-input-tokens", type=int)
     compile_p.add_argument("--max-input-tokens", type=int); compile_p.add_argument("--min-output-tokens", type=int)
     compile_p.add_argument("--max-output-tokens", type=int); compile_p.add_argument("--default-max-output-tokens", type=int, default=256)
+    compile_p.add_argument("--ignore-eos", action="store_true",
+                           help="force generation to the requested output-token cap")
     compile_p.add_argument("--bucket-boundary", action="append", type=int, default=[])
     compile_p.add_argument("--timestamp-unit", choices=["seconds", "milliseconds", "microseconds"], default="milliseconds")
     compile_p.add_argument("--include-repo", action="store_true"); compile_p.add_argument("--include-base-commit", action="store_true")
@@ -79,6 +81,7 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--timeout", type=float, default=300); run.add_argument("--pool-size", type=int, default=100)
     run.add_argument("--max-concurrency", type=int); run.add_argument("--tls-verify", action=argparse.BooleanOptionalAction, default=None)
     run.add_argument("--response-max-chars", type=int, default=10000); run.add_argument("--retries", type=int, default=0)
+    run.add_argument("--cache-salt", help="shared prefix-cache namespace for all requests in this run")
     run.add_argument("--warmup", type=int, default=0); run.add_argument("--ttft-slo-ms", type=float)
     run.add_argument("--e2e-slo-ms", type=float); run.add_argument("--tpot-slo-ms", type=float)
     summarize = sub.add_parser("summarize", help="recompute summary from events JSONL")
@@ -157,7 +160,7 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
     default_concurrency = manifest.get("arrival_parameters", {}).get("concurrency") or manifest.get("arrival_parameters", {}).get("max_concurrency") or 100
     config = SenderConfig(args.base_url, args.model, args.stream, os.getenv(args.api_key_env), headers,
         args.timeout, args.pool_size, args.max_concurrency or default_concurrency, args.tls_verify,
-        args.response_max_chars, args.retries, args.backend)
+        args.response_max_chars, args.retries, args.backend, args.cache_salt)
     sender = BenchmarkSender(config, tokenizer)
     report_config = asdict(config)
     report_config["api_key"] = "<set>" if config.api_key else None
@@ -203,7 +206,8 @@ def main(argv: list[str] | None = None) -> int:
                 arrival = PoissonPolicy(args.request_rate, args.seed, args.duration, args.max_concurrency)
             else: arrival = TimestampTracePolicy(args.time_scale, args.start_offset, args.window_start, args.window_end, args.max_concurrency)
             opts = CompileOptions(args.seed, args.max_samples, args.min_input_tokens, args.max_input_tokens,
-                args.min_output_tokens, args.max_output_tokens, args.default_max_output_tokens, tuple(sorted(args.bucket_boundary)))
+                args.min_output_tokens, args.max_output_tokens, args.default_max_output_tokens,
+                tuple(sorted(args.bucket_boundary)), args.ignore_eos)
             tokenizer_reference = portable_tokenizer_reference(args.tokenizer, Path(args.output))
             manifest = compile_workload(adapter, tokenizer, tokenizer_reference, arrival, args.output, opts,
                 tokenizer_revision=args.tokenizer_revision, source_paths=_source_paths(adapter, source), adapter_parameters=params)

@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "seed": 42,
+  "source": "/data/benchmarks/coding/swe-bench-verified/data/test-00000-of-00001.parquet",
+  "tokenizer": "/models/your-model",
+  "output_root": "../runs/swebench-request-bench",
+  "target_label": "ours",
+  "examples": 10,
+  "max_output_tokens": 128,
+  "include_repo": true,
+  "include_base_commit": true,
+  "include_hints": false,
+  "concurrency": 1,
+  "repeats": 3,
+  "stream": true,
+  "warmup": 0,
+  "timeout_s": 900,
+  "retries": 0,
+  "endpoint": {
+    "backend": "vllm",
+    "base_url": "http://127.0.0.1:8000",
+    "model": "your-served-model-name",
+    "api_key_env": "OPENAI_API_KEY",
+    "tls_verify": true,
+    "headers": {}
+  }
+}

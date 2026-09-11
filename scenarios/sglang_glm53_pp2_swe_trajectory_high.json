@@ -1,0 +1,116 @@
+{
+  "status": "GLM-5.3 FP8 on two H20 nodes, TP8/PP2, no MTP; same frozen SWE bundle",
+  "source": "/data/benchmarks/coding/swe-agent-trajectories/data",
+  "dataset_revision": "68195a1450865274106246d0d0296a1d6807b88e",
+  "reference_tokenizer": "/data/model/GLM-5.3",
+  "bundle": "../runs/agentic-replay/aliyun-high-20/bundle",
+  "seed": 42,
+  "max_sessions": 20,
+  "candidate_sessions": 200,
+  "max_input_tokens": 32768,
+  "output_cap": 4096,
+  "planned_run": {
+    "models": [
+      "GLM-5.3"
+    ],
+    "base_url": "http://127.0.0.1:30000/v1",
+    "stream": true,
+    "enable_thinking": true,
+    "reasoning_effort": "high",
+    "session_concurrency": 1,
+    "http_concurrency": 1,
+    "repeats": 1,
+    "warmup": 0,
+    "retries": 0,
+    "cache_policy": "SGLang provider-default prefix cache; no flush and no nonce",
+    "output_cap_semantics": {
+      "GLM-5.3": "max_tokens bounds generated thinking and answer tokens; preserve server usage"
+    },
+    "timeout_s": 300,
+    "auth": "none"
+  },
+  "results_root": "../runs/agentic-replay/sglang-glm53-pp2-high-20/results",
+  "network": {
+    "client_location": "192.168.0.63, same client as other frozen replay runs",
+    "server_location": "192.168.0.63 (PP0) + 192.168.0.65 (PP1), 8x H20 96GB each",
+    "transport": "HTTP loopback to PP0; inter-node NCCL Socket over eth0, NCCL_IB_DISABLE=1",
+    "api_region": "local private network",
+    "tier": "dedicated SGLang",
+    "cache": "provider-default prefix cache, fresh server, no explicit flush/nonce",
+    "rate_limit": "session=1, HTTP=1; no other benchmark requests scheduled"
+  },
+  "target_profile": "sglang-glm53",
+  "deployment": {
+    "model_path": "/data/model/GLM-5.3",
+    "environment": "/opt/miniforge3/envs/glm52-sglang on both nodes; name retained, same GLM-5.3 source",
+    "sglang_version": "0.0.0.dev1+gc767511ea",
+    "sglang_commit": "c767511ea832829129ba5255ced67b9ce1a9bc2b",
+    "sglang_existing_dirty_file": "python/sglang/srt/model_executor/model_runner_components/load_model_utils.py; preserved",
+    "tensor_parallel_size": 8,
+    "pipeline_parallel_size": 2,
+    "data_parallel_size": 1,
+    "quantization": "fp8",
+    "kv_cache_dtype": "bfloat16",
+    "attention_backend": "dsa",
+    "dsa_prefill_backend": "flashmla_sparse",
+    "dsa_decode_backend": "fa3",
+    "dsa_topk_backend": "sgl-kernel",
+    "context_length": 65536,
+    "mem_fraction_static": 0.9,
+    "max_running_requests": 16,
+    "chunked_prefill_size": 8192,
+    "max_prefill_tokens": 16384,
+    "speculative_algorithm": null,
+    "disable_overlap_schedule": true,
+    "disable_prefill_cuda_graph": true,
+    "decode_cuda_graph_sizes": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "startup_script": "scripts/run_glm53_pp2_node.sh",
+    "recipe": "https://github.com/sgl-project/sglang/blob/c767511ea832829129ba5255ced67b9ce1a9bc2b/docs/cookbook/autoregressive/GLM/GLM-5.3.mdx",
+    "reasoning_mapping": "checkpoint always opens <think>; installed SGLang maps top-level reasoning_effort=high into template",
+    "sampling_defaults": {
+      "_from_model_config": true,
+      "eos_token_id": [
+        154820,
+        154827,
+        154829
+      ],
+      "pad_token_id": 154820,
+      "temperature": 1.0,
+      "top_p": 0.95,
+      "transformers_version": "5.12.0"
+    },
+    "model_metadata": {
+      "hostname": "iv-yer00g5vr44c5qwvj5ez",
+      "dependencies": {
+        "sglang": "0.0.0.dev1+gc767511ea",
+        "torch": "2.13.0",
+        "sglang-kernel": "0.4.6.post1",
+        "flashinfer-python": "0.6.18",
+        "transformers": "5.12.1",
+        "triton": "3.7.1",
+        "ninja": "1.13.2",
+        "sgl-deep-gemm": "0.1.7"
+      },
+      "sglang_commit": "c767511ea832829129ba5255ced67b9ce1a9bc2b",
+      "sglang_dirty": " M python/sglang/srt/model_executor/model_runner_components/load_model_utils.py\n",
+      "existing_patch_sha256": "d3555e6bd535ceb4b3eb92cb2fa7d29f5bc36bc35227541a4b0d090d2d715b74",
+      "model_shards": 141,
+      "missing_shards": [],
+      "weight_bytes": 755632050320,
+      "metadata_sha256": {
+        "config.json": "3ac72612095574542f7fff847ada8e59d9199dd8af44bdf625d7e02615572e69",
+        "tokenizer_config.json": "98b1271574f41abf89427ae2dda030d94dc9478f0edc5a8bd240db213c6fd5fc",
+        "chat_template.jinja": "3740abcea51c45830cb3ca562084ad5fb2ef53589376f73332e9886f93ade41c",
+        "generation_config.json": "ac76b43d8683d3b930126870fc8be73d8679308fe752fa1f381096d8354f6a55",
+        "model.safetensors.index.json": "e0fe7f28c1f853d4824e4d796374e3dacf1fe470988773952c79b063768134bf"
+      }
+    },
+    "readiness_probe": "Internal server warmup plus one separate short OK smoke; no trajectory prompts; both excluded from formal timing"
+  }
+}
