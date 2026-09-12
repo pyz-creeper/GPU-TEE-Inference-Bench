@@ -4,6 +4,8 @@ Input Bench 是一个可复现的 LLM serving workload 编译与回放工具，�
 
 数据根目录可配置，程序始终把原始数据视为只读。Input Bench 不会在运行阶段执行 coding agent 的真实工具或做输出质量评测。
 
+已启动 SGLang DSV4-Pro（PP=2）的机密计算节点，可直接按 [Mooncake 远端执行手册](docs/MOONCAKE_DSV4_PRO_PP2_CVM_RUNBOOK.md) 准备数据、运行 120 次请求，并在 tmux 中交给 Codex 执行。
+
 ## 安装
 
 要求 Python 3.11+：
