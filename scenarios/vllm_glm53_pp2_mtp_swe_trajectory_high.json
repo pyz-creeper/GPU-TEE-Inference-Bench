@@ -1,0 +1,68 @@
+{
+  "status": "Experimental vLLM 0.28.0 + backported PR46994, TP8/PP2, MTP; same frozen SWE replay",
+  "source": "/data/benchmarks/coding/swe-agent-trajectories/data",
+  "dataset_revision": "68195a1450865274106246d0d0296a1d6807b88e",
+  "reference_tokenizer": "/data/model/GLM-5.3",
+  "bundle": "../runs/agentic-replay/aliyun-high-20/bundle",
+  "seed": 42,
+  "max_sessions": 20,
+  "candidate_sessions": 200,
+  "max_input_tokens": 32768,
+  "output_cap": 4096,
+  "planned_run": {
+    "models": [
+      "GLM-5.3"
+    ],
+    "base_url": "http://127.0.0.1:30002/v1",
+    "stream": true,
+    "enable_thinking": true,
+    "reasoning_effort": "high",
+    "session_concurrency": 1,
+    "http_concurrency": 1,
+    "repeats": 1,
+    "warmup": 0,
+    "retries": 0,
+    "cache_policy": "vLLM prefix cache enabled, no flush and no nonce",
+    "output_cap_semantics": {
+      "GLM-5.3": "max_tokens bounds generated thinking and answer tokens; preserve server usage"
+    },
+    "timeout_s": 300,
+    "auth": "none"
+  },
+  "results_root": "../runs/agentic-replay/vllm-glm53-pp2-mtp-high-20/results",
+  "network": {
+    "client_location": "192.168.0.63, same client as other frozen replay runs",
+    "server_location": "192.168.0.63 (PP0) + 192.168.0.65 (PP1), 8x H20 96GB each",
+    "transport": "HTTP loopback to PP0; inter-node NCCL Socket over eth0, NCCL_IB_DISABLE=1",
+    "api_region": "local private network",
+    "tier": "dedicated vLLM",
+    "cache": "vLLM prefix cache enabled; non-trajectory smoke only",
+    "rate_limit": "session=1, HTTP=1; no other benchmark requests scheduled"
+  },
+  "target_profile": "vllm-glm53",
+  "deployment": {
+    "model_path": "/data/model/GLM-5.3",
+    "environment": "/data/envs/glm53-vllm-pp2-mtp on both nodes",
+    "vllm_version": "0.28.0",
+    "patch": "scripts/patches/vllm-0.28.0-pp-mtp.patch",
+    "upstream_pr": 46994,
+    "upstream_commit": "bee20119f1bf9f7dd7dccc5311572b3c0a4ef14c",
+    "tensor_parallel_size": 8,
+    "pipeline_parallel_size": 2,
+    "data_parallel_size": 1,
+    "context_length": 65536,
+    "speculative_method": "mtp",
+    "num_speculative_tokens": 1,
+    "model_runner": "V2",
+    "kv_cache_dtype": "fp8",
+    "gpu_memory_utilization": 0.8,
+    "max_num_seqs": 16,
+    "max_num_batched_tokens": 8192,
+    "reasoning_mapping": "vLLM 0.28.0 ChatCompletionRequest.build_chat_params passes reasoning_effort into checkpoint template",
+    "startup_script": "scripts/run_glm53_vllm_mtp_node.sh",
+    "note": "Experimental; final parameters must match actual server before replay. FP8 KV differs from SGLang BF16 KV; endpoint comparison does not isolate MTP.",
+    "uva_compatibility": "VLLM_GLM53_UVA_FIX=1; CUDA-mapped ATen view preserves shared pinned allocation despite false-negative torch is_pinned; tests 4/4 on each node",
+    "cuda_toolchain": "CUDA13.0 nvcc/crt/nvvm13.0.88, CCCL13.0.85, system gcc/g++, private FlashInfer cache",
+    "tool_parsing": "disabled; frozen replay requests have no OpenAI tools; preserve generated shell commands as text"
+  }
+}

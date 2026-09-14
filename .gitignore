@@ -4,6 +4,7 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .venv/
+.venv-mooncake/
 venv/
 dist/
 build/
@@ -15,6 +16,10 @@ build/
 .env
 .env.*
 !.env.example
+/test.ipynb
+/test.py
+/.ipynb_checkpoints/
+/.venv-api-test/
 
 # Downloaded datasets, tokenizer/model artifacts and local caches
 /artifacts/
@@ -42,6 +47,9 @@ campaigns/**/results/
 campaigns/**/*.log
 campaigns/**/plan.json
 campaigns/**/config.snapshot.json
+campaigns/**/cache/
+campaigns/**/profile_results/
+campaigns/**/system/
 
 # Temporary profiler/server output
 profiles/

@@ -1,0 +1,17 @@
+diff --git a/vllm/utils/torch_utils.py b/vllm/utils/torch_utils.py
+index 0e133a3..3bdab99 100644
+--- a/vllm/utils/torch_utils.py
++++ b/vllm/utils/torch_utils.py
+@@ -898,6 +898,12 @@ def get_accelerator_view_from_cpu_tensor(cpu_tensor: torch.Tensor) -> torch.Tens
+             cpu_tensor = pinned
+         return torch.ops._C.get_xpu_view_from_cpu_tensor(cpu_tensor)
+     elif current_platform.is_cuda_alike():
++        # Deployment compatibility: CUDA maps this allocation even when
++        # torch's is_pinned() reports false. Never substitute a stale copy.
++        import os
++        if os.environ.get("VLLM_GLM53_UVA_FIX") == "1" and cpu_tensor.numel():
++            from glm53_uva_view import mapped_view
++            return mapped_view(cpu_tensor)
+         return torch.ops._C.get_cuda_view_from_cpu_tensor(cpu_tensor)
+     else:
+         raise ValueError(

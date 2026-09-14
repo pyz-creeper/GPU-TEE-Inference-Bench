@@ -1,0 +1,18 @@
+{
+  "seed": 20260906,
+  "model": "/data/model/GLM-5.3-Flash",
+  "served_model_name": "GLM-5.3-Flash",
+  "stream": true,
+  "temperature": 0.0,
+  "top_p": 1.0,
+  "ignore_eos": true,
+  "points": [
+    {"name": "decode-c1-i128-o512", "input_tokens": 128, "output_tokens": 512, "concurrency": 1, "requests": 16},
+    {"name": "decode-c16-i128-o512", "input_tokens": 128, "output_tokens": 512, "concurrency": 16, "requests": 80},
+    {"name": "balanced-c1-i1024-o256", "input_tokens": 1024, "output_tokens": 256, "concurrency": 1, "requests": 16},
+    {"name": "balanced-c16-i1024-o256", "input_tokens": 1024, "output_tokens": 256, "concurrency": 16, "requests": 80},
+    {"name": "balanced-c32-i1024-o256", "input_tokens": 1024, "output_tokens": 256, "concurrency": 32, "requests": 160},
+    {"name": "prefill-c1-i8192-o128", "input_tokens": 8192, "output_tokens": 128, "concurrency": 1, "requests": 16},
+    {"name": "prefill-c16-i8192-o128", "input_tokens": 8192, "output_tokens": 128, "concurrency": 16, "requests": 80}
+  ]
+}

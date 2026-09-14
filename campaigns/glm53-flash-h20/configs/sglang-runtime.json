@@ -1,0 +1,30 @@
+{
+  "launcher": "/root/serve_glm53_flash_sglang.sh",
+  "environment": "/opt/miniforge3/envs/glm53-sglang",
+  "source": "/data/src/sglang-glm53",
+  "source_commit": "c767511ea",
+  "python": "3.12.14",
+  "sglang": "0.0.0.dev1+gc767511ea",
+  "torch": "2.13.0+cu130",
+  "transformers": "5.12.1",
+  "flashinfer": "0.6.18",
+  "tensor_parallel_size": 8,
+  "expert_parallel_size": 8,
+  "max_model_len": 32768,
+  "max_running_requests": 32,
+  "gpu_memory_fraction_static": 0.70,
+  "kv_cache_dtype": "bfloat16",
+  "quantization": "fp8",
+  "moe_runner_backend": "deep_gemm",
+  "dsa_prefill_backend": "tilelang",
+  "dsa_decode_backend": "tilelang",
+  "linear_attention_backend": "triton",
+  "mtp": {
+    "algorithm": "EAGLE",
+    "adaptive": true,
+    "steps": 5,
+    "topk": 1,
+    "draft_tokens": 6
+  },
+  "listen_during_measurement": "0.0.0.0:30000"
+}

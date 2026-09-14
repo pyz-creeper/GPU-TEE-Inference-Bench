@@ -4,6 +4,10 @@ Input Bench 是一个可复现的 LLM serving workload 编译与回放工具，�
 
 数据根目录可配置，程序始终把原始数据视为只读。Input Bench 不会在运行阶段执行 coding agent 的真实工具或做输出质量评测。
 
+已启动 SGLang DSV4-Pro（PP=2）的机密计算节点，可直接按 [Mooncake 远端执行手册](docs/MOONCAKE_DSV4_PRO_PP2_CVM_RUNBOOK.md) 准备数据、运行 120 次请求，并在 tmux 中交给 Codex 执行。
+
+同一节点还可按 [20 个 SWE-agent case 固定轨迹执行手册](docs/AGENTIC_DSV4_PRO_PP2_CVM_RUNBOOK.md) 复跑原 376 次请求。
+
 ## 安装
 
 要求 Python 3.11+：
@@ -254,6 +258,75 @@ vllm bench serve --backend openai --base-url "$BASE_URL" --model "$MODEL" \
 ```
 
 两种客户端的 sampling/过滤语义并不完全相同，因此校准重点是相近 shape 下的请求计数、吞吐和延迟量级，而不是期待逐请求相同。性能实验最好让客户端与服务端运行在不同机器；若同机运行，应同时记录客户端 CPU 使用率，并重点检查 summary 中的 scheduler lag，避免把客户端瓶颈误判成服务端退化。
+
+## SWE-bench 请求总耗时 bench
+
+### 百炼完整轨迹的离线规模准备
+
+`scripts/prepare_agentic_replay.py` 使用 [规模配置](scenarios/aliyun_swe_trajectory_high.json)
+编译完整 SWE-agent trajectory。当前配置先从全部 12 个 Parquet 分片按 seed=42 选取 200 条候选，
+整条过滤非法或超过 32K reference 输入的轨迹，再冻结 20 条完整 session。
+参考 tokenizer 为本地 GLM-5.3；保存原始 shard/行号、attempt ID、录制输出长度和源文件 SHA-256。
+结构化工具调用转换成历史文本，下一轮始终使用录制内容，不执行工具。
+
+```bash
+python3 scripts/prepare_agentic_replay.py --config scenarios/aliyun_swe_trajectory_high.json
+# 更换编译参数时必须使用新目录；已有 bundle 只校验和读取，不覆盖。
+python3 scripts/prepare_agentic_replay.py --config scenarios/aliyun_swe_trajectory_high.json \
+  --bundle runs/agentic-replay/another-sample/bundle
+```
+
+首次编译需要项目依赖和配置中的本地 tokenizer；读取已有 bundle 不需要原始数据或 tokenizer。
+生成 `bundle/{workload.jsonl,manifest.json,sessions.json}`，以及相邻的 `scale.json`、
+`sessions.csv` 和 `SCALE_REPORT.md`。目前固定样本为 20 条完整 session / 376 轮，
+三个模型各一次合计 1,128 次 API 请求；准备脚本本身始终离线。
+
+`planned_run` 是待确认的实验设置，不是已执行结果：三个模型统一 thinking 开启、
+`reasoning_effort=high`、每轮 `max_tokens=4096`、session/HTTP 并发1、重复1次、无 warmup/retry。
+同名 reasoning 档位不保证同计算量。GLM 智谱直供的输出上限与 reasoning 的关系尚未验证，
+费用表使用实际计费输出量情景，不能视为预算上限。准备命令不会读取 Key 或发送任何模型请求。
+
+真实回放入口为 `scripts/run_agentic_replay.py`，复用 BenchmarkSender 的 HTTP 热路径。
+`dry-run` 离线预检，`run --model` 选择单模型或显式 `all`，`compare` 从保存的 events/config/bounds
+离线重建报告。Key 设置、完整命令、失败与取消处理见 [百炼轨迹运行手册](docs/ALIYUN_TRAJECTORY_RUNBOOK.md)。
+
+本机 DeepSeek V4 Flash 的 SGLang MTP 部署、同批轨迹回放和云端离线比较，见
+[SGLang MTP 运行手册](docs/SGLANG_DSV4_MTP_TRAJECTORY_RUNBOOK.md)。本地服务无需百炼 Key，
+使用显式的 SGLang 思考参数映射，并在启动回放前核验服务器的 MTP 设置。
+
+另见 [GLM-5.3-Flash 远端 MTP 回放](docs/GLM53_FLASH_MTP_TRAJECTORY_RUNBOOK.md)，
+以及 [GLM-5.3 旗舰版双节点可行性讨论](docs/GLM53_TWO_NODE_FEASIBILITY.md)。
+PP2、不加 MTP 的部署与同一轨迹测试见 [GLM-5.3 PP2 回放说明](docs/GLM53_PP2_TRAJECTORY_RUNBOOK.md)。
+
+vLLM 双节点 PP2 + MTP 的独立环境、适配补丁与验证见 [vLLM GLM-5.3 MTP 实验说明](docs/GLM53_VLLM_PP2_MTP_RUNBOOK.md)。
+
+`scripts/swebench_request_bench.py` 从 SWE-bench Verified 确定性抽取少量 issue，冻结为同一份 workload，并对当前服务重复回放。顶层 `benchmark-summary.json` 只聚合每次完整 workload 的客户端总耗时，不把外部 API 基线或单请求 API latency 混入比较。计时从 `BenchmarkSender` 的 monotonic start 到所有请求结束，包含 HTTP session 的创建/关闭、调度和排队，不包含数据编译、workload/tokenizer 加载与结果写盘。
+
+先复制并修改示例配置中的 tokenizer、模型名和 endpoint：
+
+```bash
+cp scenarios/swebench_request_bench.example.json scenarios/swebench_request_bench.local.json
+
+python3 scripts/swebench_request_bench.py prepare \
+  --config scenarios/swebench_request_bench.local.json
+
+python3 scripts/swebench_request_bench.py run \
+  --config scenarios/swebench_request_bench.local.json
+```
+
+也可以首次直接执行 `all`。后续 `prepare` 默认验证并复用已有的冻结 workload；只有明确传 `--force` 才重新编译。结果保存为：
+
+```text
+runs/swebench-request-bench/
+├── workload/{workload.jsonl,manifest.json}
+└── results/<run-id>/
+    ├── repeat-01/{events.jsonl,summary.json,results.parquet}
+    ├── repeat-02/...
+    ├── benchmark-summary.json
+    └── config.snapshot.json
+```
+
+如果需要单独测外部 API，使用同一个冻结 workload 再执行一次普通 `input-bench run`，并从其 `summary.json` 读取 `measurement.duration_s` 或 `latency_ms.e2e`。该结果应保存在独立目录，避免改变本 bench 的“只测当前服务”口径。这个 bench 只测请求性能，不 checkout SWE-bench 仓库、不运行测试，也不评价 patch 正确性。
 
 ## DeepSeek-V4 H800 CVM/裸金属 campaign
 

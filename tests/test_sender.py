@@ -175,3 +175,11 @@ def test_vllm_and_sglang_use_openai_compatible_routes():
         sender = BenchmarkSender(SenderConfig("http://server", "m", backend=backend), WhitespaceTokenizer())
         assert sender._payload(row)[0] == "/v1/completions"
         assert sender._payload(chat)[0] == "/v1/chat/completions"
+
+
+def test_cache_salt_is_added_to_payload():
+    sender = BenchmarkSender(
+        SenderConfig("http://server", "m", backend="vllm", cache_salt="campaign-point"),
+        WhitespaceTokenizer(),
+    )
+    assert sender._payload(request(0))[1]["cache_salt"] == "campaign-point"

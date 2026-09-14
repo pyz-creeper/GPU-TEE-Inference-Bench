@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import codecs
 from collections.abc import AsyncIterable, AsyncIterator
 from dataclasses import dataclass
 from typing import Any
@@ -17,17 +18,30 @@ class SSEEvent:
 
 
 async def iter_sse(chunks: AsyncIterable[bytes]) -> AsyncIterator[SSEEvent]:
+    decoder = codecs.getincrementaldecoder("utf-8")()
     buffer = ""
-    async for chunk in chunks:
-        try: buffer += chunk.decode("utf-8")
-        except UnicodeDecodeError as exc: raise SSEParseError(f"invalid UTF-8: {exc}") from exc
-        buffer = buffer.replace("\r\n", "\n").replace("\r", "\n")
-        while "\n\n" in buffer:
-            block, buffer = buffer.split("\n\n", 1)
-            event = _parse_block(block)
-            if event is not None: yield event
-    if buffer.strip():
-        event = _parse_block(buffer)
+    lines = []
+    try:
+        async for chunk in chunks:
+            buffer += decoder.decode(chunk)
+            # A trailing CR might be the first byte of a CRLF spanning chunks.
+            trailing_cr = buffer.endswith("\r")
+            body = buffer[:-1] if trailing_cr else buffer
+            buffer = body.replace("\r\n", "\n").replace("\r", "\n") + ("\r" if trailing_cr else "")
+            while "\n" in buffer:
+                line, buffer = buffer.split("\n", 1)
+                line = line.rstrip("\r")
+                if not line:
+                    event = _parse_block("\n".join(lines)); lines = []
+                    if event is not None: yield event
+                else:
+                    lines.append(line)
+        buffer += decoder.decode(b"", final=True)
+    except UnicodeDecodeError as exc:
+        raise SSEParseError("invalid UTF-8 in SSE stream") from exc
+    if buffer: lines.append(buffer.rstrip("\r"))
+    if lines:
+        event = _parse_block("\n".join(lines))
         if event is not None: yield event
 
 

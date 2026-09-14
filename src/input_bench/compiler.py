@@ -28,6 +28,7 @@ class CompileOptions:
     max_output_tokens: int | None = None
     default_max_output_tokens: int = 256
     bucket_boundaries: tuple[int, ...] = ()
+    ignore_eos: bool = False
 
     def __post_init__(self) -> None:
         if self.max_samples is not None and self.max_samples < 0:
@@ -119,12 +120,15 @@ def compile_workload(adapter: Any, tokenizer: Tokenizer, tokenizer_id: str,
         metadata = dict(sample.metadata)
         if options.bucket_boundaries:
             metadata["input_token_bucket_upper"] = next((x for x in options.bucket_boundaries if input_count <= x), None)
+        sampling = {"temperature": 0.0, "top_p": 1.0, "seed": options.seed}
+        if options.ignore_eos:
+            sampling["ignore_eos"] = True
         requests.append(WorkloadRequest(sample.sample_id, sequence, sample.source,
             sample.workload_class, "chat" if messages is not None else "completions",
             input_count, output_count, session_id=sample.session_id,
             parent_request_id=sample.parent_sample_id, scheduled_offset_s=offset,
             messages=messages, prompt=sample.prompt,
-            sampling={"temperature": 0.0, "top_p": 1.0, "seed": options.seed}, metadata=metadata))
+            sampling=sampling, metadata=metadata))
     with output.open("w", encoding="utf-8") as handle:
         for request in requests:
             handle.write(json.dumps(request.to_dict(), ensure_ascii=False, sort_keys=True,

@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "seed": 20260905,
+  "data_root": "/data/benchmarks",
+  "campaign_root": "/data/benchmarks/glm52-pp2-campaign",
+  "tokenizer": "/data/model/GLM-5.2-FP8",
+  "endpoint": {
+    "backend": "sglang",
+    "base_url": "http://192.168.0.63:30000",
+    "model": "GLM-5.2-FP8"
+  },
+  "context_length": 32768,
+  "output_cap": 128,
+  "fixed": [
+    {
+      "name": "conversation",
+      "source": "traces/mooncake/conversation_trace.jsonl",
+      "requests": 12,
+      "concurrency": [1, 4],
+      "min_input_tokens": 1024,
+      "max_input_tokens": 24576,
+      "min_output_tokens": 128
+    },
+    {
+      "name": "toolagent",
+      "source": "traces/mooncake/toolagent_trace.jsonl",
+      "requests": 24,
+      "concurrency": [4, 8],
+      "min_input_tokens": 1024,
+      "max_input_tokens": 24576,
+      "min_output_tokens": 8
+    }
+  ],
+  "trace": {
+    "name": "toolagent-trace",
+    "source": "traces/mooncake/toolagent_trace.jsonl",
+    "requests": 48,
+    "target_duration_s": 60.0,
+    "max_concurrency": 16,
+    "min_input_tokens": 1024,
+    "max_input_tokens": 24576,
+    "min_output_tokens": 8
+  },
+  "slo_ms": {
+    "ttft": 5000,
+    "tpot": 20,
+    "e2e": 120000
+  }
+}

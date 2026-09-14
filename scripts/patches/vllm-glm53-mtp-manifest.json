@@ -1,0 +1,66 @@
+{
+  "base_version": "0.28.0",
+  "base_commit": "2cf0a6915ce544dc493a0990f2ea38d81601128a",
+  "upstream_pr": 46994,
+  "upstream_commit": "bee20119f1bf9f7dd7dccc5311572b3c0a4ef14c",
+  "adaptation": "Three context-only adaptations: expose topk buffer on model; read current indexer buffer in flashattn and XPU sparse backends. No C/CUDA changes.",
+  "files": {
+    "vllm/model_executor/models/deepseek_mtp.py": {
+      "before": "88521bcf3bfec6c773998dbefe30448504640907a4ac98f4e822d0ed38e2436f",
+      "after": "d814c35e59191259815529541883f29f74c4e74a893ef7db850f6bd52014c32d"
+    },
+    "vllm/model_executor/models/qwen3_5_mtp.py": {
+      "before": "08a83fa1f6bd76fee2e0567d8d440fc05191cbb7a019c1a797ccefb63f51346d",
+      "after": "0f19dce7735c4bcccdf92f21330f512c6f5729fbcdbc083bd59f380c91774362"
+    },
+    "vllm/models/deepseek_v32/nvidia/model.py": {
+      "before": "e3b329da4d411ae9ef54043a3a664dc5defef1271a9aae4ff77267165a9e8574",
+      "after": "fc36fbc1411bc65c6e07f4a0a5f073c4180c81ddb16ae0729bea468a14e85cb1"
+    },
+    "vllm/v1/attention/backends/mla/flashattn_mla_sparse.py": {
+      "before": "3bcfde8d6645201221255482b01691e068740928f4ffa9526f3dbe13da3b2671",
+      "after": "ae577eda8f9ce1b2a1f236197229fe4d3ed7dc10a236baf1da2c8252d7b5ee28"
+    },
+    "vllm/v1/attention/backends/mla/flashinfer_mla_sparse.py": {
+      "before": "550079022e858952c37bfa1198dbb1c77884571af30eb4c2f1a8055cd6ca7b07",
+      "after": "4cea623059e8c6eb6494b4e5e9245406f8666bf6537352c8bb95161c7297711e"
+    },
+    "vllm/v1/attention/backends/mla/flashinfer_mla_sparse_sm120.py": {
+      "before": "dad776336da92d0a7f65cf1b6f1f53221a35e2c1236045057a8e963a36614808",
+      "after": "fe450d3ff28a50922a9beedb6036beb3c34561e7d725e0ca83486d86f862a4bf"
+    },
+    "vllm/v1/attention/backends/mla/flashmla_sparse.py": {
+      "before": "0544c431bbf311d7283fee7f34cd7ad8a2df7961380646f2c12db2e861608ee4",
+      "after": "184bee36facb38a975280df55660207658f2c9a3fbd01fcbd93564cacd530fa8"
+    },
+    "vllm/v1/attention/backends/mla/rocm_aiter_mla_sparse.py": {
+      "before": "d63ca21823d091966d795f91f8ad61380b0c0eee78adf670d877d44ddd0b40a1",
+      "after": "19e5ecc0939482a94f3ceef6f217c2cb1d3b666b46cc2770f96fc3ce0890c150"
+    },
+    "vllm/v1/attention/backends/mla/xpu_mla_sparse.py": {
+      "before": "fe277f27e37792edf4eb14a84b188a116549951d07bcb66aff52f470981618e5",
+      "after": "0ece9b54926b528df2efa39488efbec34ae14282716151d4919b996aeea6a28a"
+    },
+    "vllm/v1/worker/gpu/model_runner.py": {
+      "before": "fb08762e3a025fdc55ab8d2605a96a57d1fad7efae0fbb605cc4fe2973028aca",
+      "after": "7ef5ce406517d9e6a84526947d757111364b25f951541f5f26771bd90b137699"
+    },
+    "vllm/v1/worker/gpu/pp_utils.py": {
+      "before": "79cd7d52f7c9fd3bc3f3a3bf61aec3dfe72ec6b4938d1b8b11845a0d75ae0ce4",
+      "after": "253d60ef4262ad962a9d056a5aee1fb60fe0176eb75bd93e2d133125065b4a00"
+    },
+    "vllm/utils/torch_utils.py": {
+      "before": "996a632d3c41d9fa0f64e9b0407010105fa320813472c376ec8d4071c7200192",
+      "after": "91570d874fdb06b598383f48254410220e305d2d95153c489fce000fe9a5699b"
+    },
+    "glm53_uva_view.py": {
+      "before": null,
+      "after": "997873a6a718dfdb8321d8378f2b09884a1f85cabc8fd4d0880a53cb9628ffd6"
+    },
+    "glm53_uva_view.cpp": {
+      "before": null,
+      "after": "7414deb519128a88f3632bd2369b2a05f34f0ff3890f2948cba748a8c57d68ea"
+    }
+  },
+  "uva_fix": "CUDA-mapped ATen alias; no temporary sampling diagnostics."
+}
